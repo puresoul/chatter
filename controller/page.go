@@ -30,6 +30,5 @@ setInterval(function(){
 }, 5000);
 </script>
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-
 </html>
 `

@@ -7,29 +7,38 @@ import (
 )
 
 type StoreFuncs struct {
-	Create func(string)
-	Add    func(string, string, string)
-	Get    func(string, string) string
-	Update func(string, int64) bool
+	user   string
+	Add    func(Msg)
+	Get    func(string, string) []Msg
 	Del    func(string)
 }
 
-type dataStore struct {
-	json  string
-	key   string
+type Msg struct {
+	Author string
+        User  string
+	Text   string
+	Time  string
+	Done  bool
 }
 
-type dataMap map[string]dataStore
+type msgStore struct {
+        user  string
+	text   string
+	time  string
+	done   bool
+}
+
+type userMap map[string][]msgStore
 
 var (
-	dm    dataMap
+	um    userMap
 	mutex sync.RWMutex
-	df    dataFuncs
+	df    StoreFuncs
 )
 
 func init() {
 	mutex.Lock()
-	tm = make(map[string]dataStore)
+	um = make(map[string][]msgStore)
 	mutex.Unlock()
 }
 
@@ -40,22 +49,37 @@ func Init() *StoreFuncs {
 	return &df
 }
 
-func add(tk string) {
+func add(m Msg) {
 	mutex.Lock()
-	tp := dataStore{json: j, id: i}
-	dm[key] = tp
+	tp := msgStore{user: m.User, text: m.Text, time: fmt.Sprint(time.Now()), done: false}
+	um[m.Author] = append(um[m.Author], tp)
+	fmt.Printf("%#V \n", um)
 	mutex.Unlock()
 }
 
-func get(k string) dataStore {
-	if v, ok := dm[k]; ok {
-		return v
+func get(a, u string) []Msg {
+	var o []Msg
+	// my msg
+	if v, ok := um[a]; ok {
+		for _, m := range v {
+			if m.user == u {
+				o = append(o, Msg{User: a, Text: m.text, Time: m.time})
+			}
+		}
 	}
-	return dataStore{}
+	// other
+	if v, ok := um[u]; ok {
+		for _, m := range v {
+			if m.user == a {
+				o = append(o, Msg{User: u, Text: m.text, Time: m.time})
+			}
+		}
+	}
+	return o
 }
 
 func del(k string) {
 	mutex.Lock()
-	delete(dm[k])
+	delete(um, k)
 	mutex.Unlock()
 }
