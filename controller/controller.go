@@ -29,8 +29,9 @@ type msg struct {
 
 func Load() {
         router.Get("/", index)
-        router.Get("/chat/", chatapi)
+        router.Get("/chat/", chatApi)
 	router.Get("/dbg", dbg)
+	router.Get("/login/", loginApi)
 }
 
 func dbg(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +41,12 @@ func dbg(w http.ResponseWriter, r *http.Request) {
     ds.Add(datastore.Msg{Author: "u1", User:"u2",Text:"hi"})
 }
 
-func chatapi(w http.ResponseWriter, r *http.Request) {
+func loginApi(w http.ResponseWriter, r *http.Request) {
+    t, _ := template.New("login").Parse(loginpage)
+    _ = t.Execute(w, "")
+}
+
+func chatApi(w http.ResponseWriter, r *http.Request) {
     ds := datastore.Init()
 
     u := users{Name: "Lol", Time: "Now"}

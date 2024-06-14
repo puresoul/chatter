@@ -18,17 +18,32 @@ const page = `
 
 </body>
 
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+
 <script>
 let user = "";
+let check = 0;
 
 function setName(e) {
 user = e.id;
 }
 
-setInterval(function(){
-   $( '#chat' ).load('/chat/?username='+user+' #chat');
-}, 5000);
+function solve() {
+   var usr = document.getElementById('first').value;
+   var password = document.getElementById('password').value;
+   user = usr;
+   if (check == 0) {
+   setInterval(function(){
+     $( '#chat' ).load('/chat/?username='+user+' #chat');
+   }, 5000);
+   check = 1;
+   }
+}
+
+$( '#chat' ).load('/login/ #chat');
+
+
 </script>
-<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+
 </html>
 `

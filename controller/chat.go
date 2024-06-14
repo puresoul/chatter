@@ -27,12 +27,12 @@ const chatpage = `
                 {{range .}}
                 {{ if .Me }}
                 <div class="bubble me">
-                    ME
+                    {{.Me}}
                 </div>
                 {{end}}
                 {{ if .You }}
                 <div class="bubble you">
-                    YOU
+                    {{.You}}
                 </div>
                {{end}}
                {{end}}
