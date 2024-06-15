@@ -8,6 +8,20 @@ import (
         "text/template"
 )
 
+const jspage = `
+const headers = new Headers();
+
+if (headers.get("Auth") == null) {
+    $( '#chat' ).load('/login/ #chat');
+} else {
+   setInterval(function(){
+     $( '#chat' ).load('/chat/ #chat');
+   }, 5000);
+}
+`
+
+
+
 type data struct {
     Name string
     Usr []users
@@ -25,6 +39,11 @@ type msg struct {
     You string
     Done bool
     Time string
+}
+
+type page struct {
+    Style string
+    Js    string
 }
 
 func Load() {
@@ -62,7 +81,8 @@ func chatApi(w http.ResponseWriter, r *http.Request) {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-    t, _ := template.New("webpage").Parse(page)
-    _ = t.Execute(w, style)
+    d := page{Style: style, Js: jspage}
+    t, _ := template.New("webpage").Parse(mainPage)
+    _ = t.Execute(w, d)
 }
 
