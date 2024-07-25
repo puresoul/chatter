@@ -1,5 +1,11 @@
 package controller
 
+import (
+	"fmt"
+	"net/http"
+	"text/template"
+	"chatter/datastore"
+)
 
 const chatpage = `
 <html>
@@ -47,3 +53,37 @@ const chatpage = `
 </body>
 </html>
 `
+
+type data struct {
+	Name string
+	Usr  []users
+	Msg  []msg
+}
+
+type users struct {
+	Name string
+	Time string
+	Msg  bool
+}
+
+type msg struct {
+	Me   string
+	You  string
+	Done bool
+	Time string
+}
+
+func chatApi(w http.ResponseWriter, r *http.Request) {
+	ds := datastore.Init()
+
+	u := users{Name: "Lol", Time: "Now"}
+	m1 := msg{Me: "Hi"}
+	m2 := msg{You: "Hou"}
+	s := data{Usr: []users{u}, Msg: []msg{m1, m1, m2, m2, m1, m2}}
+
+	//    x := r.FormValue("username")
+	fmt.Println(ds.Get("u1", "u2"))
+
+	t, _ := template.New("chatpage").Parse(chatpage)
+	_ = t.Execute(w, s)
+}

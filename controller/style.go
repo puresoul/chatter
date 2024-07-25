@@ -44,20 +44,19 @@ body {
   left: 50%;
   width: 80%;
   height: 75%;
-  background-color: var(--white);
   transform: translate(-50%, -50%);
 }
 
 .login {
   position: relative;
   background-color: var(--white);
-transform: translate(50%, 50%);
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    padding: 10px 20px;
-    transition: transform 0.2s;
-    width: 500px;
-    text-align: center;
+  transform: translate(75%, 50%);
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+  transition: transform 0.2s;
+  width: 40%;
+  text-align: center;
 }
 
 label {
