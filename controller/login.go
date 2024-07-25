@@ -1,9 +1,10 @@
 package controller
 
 import (
-    "net/http"
-    "log"
-    "golang.org/x/crypto/bcrypt"
+	"chatter/datastore"
+	"golang.org/x/crypto/bcrypt"
+	"log"
+	"net/http"
 )
 
 const loginpage = `
@@ -36,16 +37,20 @@ const loginpage = `
 
 func loginApi(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-	    log.Println(err)
-	    return
+		log.Println(err)
+		return
 	}
 	name := r.FormValue("name")
 	password := r.FormValue("password")
 
-        hash, err := bcrypt.GenerateFromPassword([]byte(name+password), bcrypt.MinCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(name+password), bcrypt.MinCost)
 	if err != nil {
-        log.Println(err)
-        }
-        w.Header().Set("Authorization", string(hash))
-        return 
+		log.Println(err)
+	}
+
+	ds := datastore.Init()
+
+	ds.New(name, string(hash))
+
+	http.Redirect(w, r, "/?t="+string(hash), http.StatusFound)
 }

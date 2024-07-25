@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"chatter/datastore"
 	"fmt"
 	"net/http"
 	"text/template"
-	"chatter/datastore"
 )
 
 const chatpage = `

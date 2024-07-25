@@ -2,10 +2,9 @@
 package controller
 
 import (
-        "net/http"
-        "text/template"
+	"net/http"
+	"text/template"
 )
-
 
 const mainPage = `
 <!DOCTYPE html>
@@ -29,29 +28,24 @@ const mainPage = `
 `
 
 type Page struct {
-	Style string
-	Js    string
+	Style   string
+	Js      string
 	Content string
 }
 
 func (p *Page) pageApi(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.New("webpage").Parse(mainPage)
 
-        p.Style = style
+	p.Style = style
 
-        if r.Header.Get("Authorization") == "" {
-                p.Content = loginpage
-                p.Js = `const myHeaders = new Headers(); // Currently empty
-myHeaders.set("Authorization", "image/jpeg");
-		`
+	if r.URL.Query().Get("t") == "" {
+		p.Content = loginpage
 		_ = t.Execute(w, p)
-                return
-        }
+		return
+	}
 
-        p.Content = `<div class="wrapper" id="chat">`
-        p.Js = jspage
+	p.Content = `<div class="wrapper" id="chat">`
+	p.Js = jspage
 
 	_ = t.Execute(w, p)
 }
-
-
