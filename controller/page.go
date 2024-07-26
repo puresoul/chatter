@@ -54,9 +54,13 @@ func (p *Page) pageApi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ds := datastore.Init()
-	p.Js = returnJs(ds.Test(n))
+	// todo full auth with hash rotation
 
+	ds := datastore.Init()
+	if ds.Test(n) {
+		p.Js = returnJs("")
+	}
+	
 	p.Content = `<div class="wrapper" id="chat">`
 
 	_ = t.Execute(w, p)

@@ -12,7 +12,7 @@ type StoreFuncs struct {
 	Get  func(string, string) []NewMsg
 	Del  func(string)
 	New  func(string, string)
-	Test func(string) string
+	Test func(string) bool
 }
 
 type NewMsg struct {
@@ -31,7 +31,8 @@ type msgStore struct {
 }
 
 type hashStore struct {
-    hash string
+    name string
+    token string
     time int64
 }
 
@@ -63,21 +64,21 @@ func Init() *StoreFuncs {
 }
 
 func new(nm, hs string) {
-	if _, ok := hm[nm]; !ok {
-	now := time.Now()
-	sec := now.Unix()
 	mutex.Lock()
-	hm[nm] = hashStore{hash: hs, time: sec}
+	hm[hs] = hashStore{}
 	um[nm] = []msgStore{}
 	mutex.Unlock()
-	}
 }
 
-func test(nm string) string {
-	if h, ok := hm[nm]; ok {
-		return h.hash
+// todo hash rotation
+
+func test(nm string) bool {
+	for _, v := range hm {
+		if v.name == nm {
+			return true
+		}
 	}
-	return ""
+	return false
 }
 
 func add(m NewMsg) {
