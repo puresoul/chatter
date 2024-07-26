@@ -4,7 +4,7 @@ package controller
 import (
 	"net/http"
 	"text/template"
-	"chatter/datastore"
+//	"chatter/datastore"
 )
 
 const mainPage = `
@@ -34,7 +34,7 @@ type Page struct {
 	Content string
 }
 
-func returnJs(t string) string {
+func returnJS(t string) string {
     return `
    setInterval(function(){
      $( '#chat' ).load('/chat/?t=`+t+` #chat');
@@ -56,11 +56,8 @@ func (p *Page) pageApi(w http.ResponseWriter, r *http.Request) {
 
 	// todo full auth with hash rotation
 
-	ds := datastore.Init()
-	if ds.Test(n) {
-		p.Js = returnJs("")
-	}
-	
+//	ds := datastore.Init()
+
 	p.Content = `<div class="wrapper" id="chat">`
 
 	_ = t.Execute(w, p)

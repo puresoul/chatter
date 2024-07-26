@@ -8,11 +8,22 @@ import (
 
 func Load() {
 	router.Get("/", index)
-	router.Post("/", loginApi)
+	router.Post("/", login)
 	router.Get("/chat/", chatApi)
 }
 
+var (
+    p *Page
+)
+
+func init() {
+	p = &Page{}
+}
+
 func index(w http.ResponseWriter, r *http.Request) {
-	d := &Page{}
-	d.pageApi(w, r)
+	p.pageApi(w, r)
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+	p.loginApi(w, r)
 }

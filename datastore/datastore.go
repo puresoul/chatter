@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"chatter/auth"
 	"fmt"
 	"sync"
 	"time"
@@ -11,7 +12,7 @@ type StoreFuncs struct {
 	Add  func(NewMsg)
 	Get  func(string, string) []NewMsg
 	Del  func(string)
-	New  func(string, string)
+	New  func(string, string) string
 	Test func(string) bool
 }
 
@@ -31,9 +32,9 @@ type msgStore struct {
 }
 
 type hashStore struct {
-    name string
-    token string
-    time int64
+	name  string
+	token string
+	time  int64
 }
 
 type userMap map[string][]msgStore
@@ -63,33 +64,43 @@ func Init() *StoreFuncs {
 	return &df
 }
 
-func new(nm, hs string) {
+func new(nm, ps string) string {
+	now := time.Now()
+	sec := now.Unix()
+	hs := auth.Hash(nm+ps)
+	t := auth.Encode(fmt.Sprint(sec) + " " + hs)
 	mutex.Lock()
-	hm[hs] = hashStore{}
+	hm[hs] = hashStore{name: nm, token: t, time: sec}
 	um[nm] = []msgStore{}
 	mutex.Unlock()
+	fmt.Printf("\n hashStore: %#v \n msgStore: %#v \n", hm, um)
+	return t
 }
 
-// todo hash rotation
-
-func test(nm string) bool {
-	for _, v := range hm {
-		if v.name == nm {
-			return true
+func test(t string) bool {
+	i, h := auth.Decode(t)
+	if v, ok := hm[h]; ok {
+		if i == fmt.Sprint(v.time) {
+			now := time.Now()
+			sec := now.Unix()
+			if v.time+300 < sec {
+				v.token = auth.Encode(fmt.Sprint(sec)+ " " + h)
+				v.time = sec			}
+			return false
 		}
 	}
-	return false
+	return true
 }
 
 func add(m NewMsg) {
 	if _, ok := um[m.Author]; !ok {
-		fmt.Printf("Wrong user\n %#V  \n", m)
+		fmt.Printf("Wrong user\n %#v  \n", m)
 		return
 	}
 	mutex.Lock()
 	tp := msgStore{reciver: m.Reciver, text: m.Text, time: fmt.Sprint(time.Now()), done: false}
 	um[m.Author] = append(um[m.Author], tp)
-	fmt.Printf("%#V \n", um)
+	fmt.Printf("%#v \n", um)
 	mutex.Unlock()
 }
 

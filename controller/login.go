@@ -2,7 +2,7 @@ package controller
 
 import (
 	"chatter/datastore"
-	"chatter/auth"
+//	"chatter/auth"
 	"log"
 	"net/http"
 )
@@ -35,7 +35,7 @@ const loginpage = `
 </div>
 `
 
-func loginApi(w http.ResponseWriter, r *http.Request) {
+func (p *Page) loginApi(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		log.Println(err)
 		return
@@ -43,12 +43,10 @@ func loginApi(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("user")
 	password := r.FormValue("password")
 
-	// todo token gen, hash gen and login
-
-	_ = auth.Hash("")
 
 	ds := datastore.Init()
-	ds.New(name, password)
+	t := ds.New(name, password)
+	p.Js = returnJS(t)
 
 	http.Redirect(w, r, "/?n="+name, http.StatusFound)
 }

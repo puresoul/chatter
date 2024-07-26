@@ -74,8 +74,13 @@ type msg struct {
 }
 
 func chatApi(w http.ResponseWriter, r *http.Request) {
-	ds := datastore.Init()
+	t := r.URL.Query().Get("t")
 
+	ds := datastore.Init()
+	if ds.Test(t) {
+		return
+	}
+	
 	u := users{Name: "Lol", Time: "Now"}
 	m1 := msg{Me: "Hi"}
 	m2 := msg{You: "Hou"}
@@ -84,6 +89,6 @@ func chatApi(w http.ResponseWriter, r *http.Request) {
 	//    x := r.FormValue("username")
 	fmt.Println(ds.Get("u1", "u2"))
 
-	t, _ := template.New("chatpage").Parse(chatpage)
-	_ = t.Execute(w, s)
+	tmp, _ := template.New("chatpage").Parse(chatpage)
+	_ = tmp.Execute(w, s)
 }
