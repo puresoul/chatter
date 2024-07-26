@@ -12,6 +12,7 @@ type StoreFuncs struct {
 	Get  func(string, string) []NewMsg
 	Del  func(string)
 	New  func(string, string)
+	Test func(string) string
 }
 
 type NewMsg struct {
@@ -29,9 +30,14 @@ type msgStore struct {
 	done    bool
 }
 
+type hashStore struct {
+    hash string
+    time int64
+}
+
 type userMap map[string][]msgStore
 
-type hashMap map[string]string
+type hashMap map[string]hashStore
 
 var (
 	um    userMap
@@ -43,11 +49,12 @@ var (
 func init() {
 	mutex.Lock()
 	um = make(map[string][]msgStore)
-	hm = make(map[string]string)
+	hm = make(map[string]hashStore)
 	mutex.Unlock()
 }
 
 func Init() *StoreFuncs {
+	df.Test = test
 	df.New = new
 	df.Add = add
 	df.Get = get
@@ -56,8 +63,21 @@ func Init() *StoreFuncs {
 }
 
 func new(nm, hs string) {
-	hm[hs] = nm
+	if _, ok := hm[nm]; !ok {
+	now := time.Now()
+	sec := now.Unix()
+	mutex.Lock()
+	hm[nm] = hashStore{hash: hs, time: sec}
 	um[nm] = []msgStore{}
+	mutex.Unlock()
+	}
+}
+
+func test(nm string) string {
+	if h, ok := hm[nm]; ok {
+		return h.hash
+	}
+	return ""
 }
 
 func add(m NewMsg) {
@@ -96,5 +116,6 @@ func get(a, u string) []NewMsg {
 func del(k string) {
 	mutex.Lock()
 	delete(um, k)
+	delete(hm, k)
 	mutex.Unlock()
 }

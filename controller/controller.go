@@ -2,15 +2,9 @@ package controller
 
 import (
 	"chatter/router"
+//	"chatter/datastore"
 	"net/http"
 )
-
-const jspage = `
-   setInterval(function(){
-     $( '#chat' ).load('/chat/ #chat');
-   }, 5000);
-
-`
 
 func Load() {
 	router.Get("/", index)

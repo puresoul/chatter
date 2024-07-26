@@ -4,6 +4,7 @@ package controller
 import (
 	"net/http"
 	"text/template"
+	"chatter/datastore"
 )
 
 const mainPage = `
@@ -33,19 +34,30 @@ type Page struct {
 	Content string
 }
 
+func returnJs(t string) string {
+    return `
+   setInterval(function(){
+     $( '#chat' ).load('/chat/?t=`+t+` #chat');
+   }, 5000);
+`
+}
+
 func (p *Page) pageApi(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.New("webpage").Parse(mainPage)
 
 	p.Style = style
+	n := r.URL.Query().Get("n")
 
-	if r.URL.Query().Get("t") == "" {
+	if n == "" {
 		p.Content = loginpage
 		_ = t.Execute(w, p)
 		return
 	}
 
+	ds := datastore.Init()
+	p.Js = returnJs(ds.Test(n))
+
 	p.Content = `<div class="wrapper" id="chat">`
-	p.Js = jspage
 
 	_ = t.Execute(w, p)
 }

@@ -2,7 +2,7 @@ package controller
 
 import (
 	"chatter/datastore"
-	"golang.org/x/crypto/bcrypt"
+	"chatter/auth"
 	"log"
 	"net/http"
 )
@@ -40,17 +40,15 @@ func loginApi(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	name := r.FormValue("name")
+	name := r.FormValue("user")
 	password := r.FormValue("password")
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(name+password), bcrypt.MinCost)
-	if err != nil {
-		log.Println(err)
-	}
+	// todo token gen, hash gen and login
+
+	_ = auth.Hash("")
 
 	ds := datastore.Init()
+	ds.New(name, password)
 
-	ds.New(name, string(hash))
-
-	http.Redirect(w, r, "/?t="+string(hash), http.StatusFound)
+	http.Redirect(w, r, "/?n="+name, http.StatusFound)
 }
